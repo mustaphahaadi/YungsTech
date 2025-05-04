@@ -13,7 +13,7 @@ YungsTech is an interactive learning platform designed to make tech education en
 - **Vite** for fast development and building
 - **TailwindCSS** for styling
 - **Monaco Editor** for code editing capabilities
-- **Supabase** client for additional backend services
+- **Local Storage** for client-side data persistence
 
 ### Backend
 - **Django 5.0.2** with Django REST Framework
@@ -39,7 +39,6 @@ YungsTech/
 │   ├── lib/               # Utility functions
 │   └── types/             # TypeScript type definitions
 │
-├── supabase/              # Supabase configurations
 └── .env                   # Environment variables
 ```
 
@@ -140,6 +139,30 @@ YungsTech/
   npm run build
   ```
 
+## Client-Side Storage
+
+The application uses browser's Local Storage for client-side data persistence. This includes:
+
+- User preferences
+- Authentication tokens
+- Learning progress
+- Cached content
+
+To implement local storage in your components:
+
+```typescript
+// Save data to localStorage
+const saveData = (key: string, value: any) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
+
+// Retrieve data from localStorage
+const loadData = (key: string) => {
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : null;
+};
+```
+
 ## Deployment
 
 ### Backend Deployment
@@ -156,4 +179,9 @@ YungsTech/
 2. Deploy the contents of the `dist` directory to your hosting service
 
 ## License
-No lience yet
+
+This project is currently unlicensed.
+
+## Contributors
+
+YungsTech Team

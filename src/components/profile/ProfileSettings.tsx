@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabase';
+import { localStorageClient } from '../../lib/localStorage';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { Settings, Clock, Brain, BookOpen, Save } from 'lucide-react';
@@ -19,16 +19,43 @@ const ProfileSettings: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({
-          learning_speed: settings.learningSpeed,
-          preferred_learning_style: settings.preferredStyle,
-          daily_goal: settings.dailyGoal
-        })
-        .eq('id', user?.id);
-
-      if (error) throw error;
+      // Get current users from localStorage
+      const usersJson = window.localStorage.getItem('yungs_tech_users') || '[]';
+      let users = JSON.parse(usersJson);
+      
+      // Find and update the current user
+      const updatedUsers = users.map((u: any) => {
+        if (u.id === user?.id) {
+          return {
+            ...u,
+            user_metadata: {
+              ...u.user_metadata,
+              learning_speed: settings.learningSpeed,
+              preferred_learning_style: settings.preferredStyle,
+              daily_goal: settings.dailyGoal
+            }
+          };
+        }
+        return u;
+      });
+      
+      // Save back to localStorage
+      window.localStorage.setItem('yungs_tech_users', JSON.stringify(updatedUsers));
+      
+      // Update current user if needed
+      const currentUserJson = window.localStorage.getItem('yungs_tech_user');
+      if (currentUserJson) {
+        const currentUser = JSON.parse(currentUserJson);
+        if (currentUser.id === user?.id) {
+          currentUser.user_metadata = {
+            ...currentUser.user_metadata,
+            learning_speed: settings.learningSpeed,
+            preferred_learning_style: settings.preferredStyle,
+            daily_goal: settings.dailyGoal
+          };
+          window.localStorage.setItem('yungs_tech_user', JSON.stringify(currentUser));
+        }
+      }
     } catch (error) {
       console.error('Error updating settings:', error);
     } finally {

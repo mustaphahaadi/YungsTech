@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { localStorageClient } from '../../lib/localStorage';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
 import { Bell, Star, Trophy, Calendar, X } from 'lucide-react';
@@ -18,34 +18,36 @@ const NotificationCenter: React.FC = () => {
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(showAll ? 50 : 5);
-
-      if (data && !error) {
+    const fetchNotifications = () => {
+      // Get notifications from localStorage
+      const notificationsJson = window.localStorage.getItem('yungs_tech_db_notifications') || '[]';
+      try {
+        let data = JSON.parse(notificationsJson);
+        
+        // Sort by created_at in descending order
+        data.sort((a: any, b: any) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        
+        // Limit results if not showing all
+        if (!showAll && data.length > 5) {
+          data = data.slice(0, 5);
+        }
+        
         setNotifications(data);
+      } catch (e) {
+        console.error('Failed to parse notifications from localStorage', e);
+        setNotifications([]);
       }
     };
 
     fetchNotifications();
-
-    // Subscribe to new notifications
-    const subscription = supabase
-      .channel('notifications')
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'notifications' 
-      }, payload => {
-        setNotifications(current => [payload.new as Notification, ...current]);
-      })
-      .subscribe();
-
+    
+    // Set up a simple polling mechanism to check for new notifications
+    const intervalId = setInterval(fetchNotifications, 5000);
+    
     return () => {
-      subscription.unsubscribe();
+      clearInterval(intervalId);
     };
   }, [showAll]);
 
@@ -63,14 +65,26 @@ const NotificationCenter: React.FC = () => {
   };
 
   const markAsRead = async (id: string) => {
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('id', id);
-
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
+    // Get notifications from localStorage
+    const notificationsJson = window.localStorage.getItem('yungs_tech_db_notifications') || '[]';
+    try {
+      let allNotifications = JSON.parse(notificationsJson);
+      
+      // Update the notification with the matching id
+      const updatedNotifications = allNotifications.map((n: any) => 
+        n.id === id ? { ...n, read: true } : n
+      );
+      
+      // Save back to localStorage
+      window.localStorage.setItem('yungs_tech_db_notifications', JSON.stringify(updatedNotifications));
+      
+      // Update state
+      setNotifications(notifications.map(n => 
+        n.id === id ? { ...n, read: true } : n
+      ));
+    } catch (e) {
+      console.error('Failed to update notification', e);
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { localStorageClient } from '../../lib/localStorage';
 import Button from '../ui/Button';
 import { UserPlus } from 'lucide-react';
 
@@ -21,7 +21,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignInClick }) => 
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await localStorageClient.auth.signUp({
         email,
         password,
         options: {

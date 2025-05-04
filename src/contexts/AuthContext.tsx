@@ -1,6 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import { localStorageClient } from '../lib/localStorage';
+
+// Define a User type to replace Supabase's User
+interface User {
+  id: string;
+  email: string;
+  username: string;
+  user_metadata?: {
+    username: string;
+    learning_speed: string;
+    preferred_learning_style: string;
+    daily_goal: number;
+  };
+}
 
 interface AuthContextType {
   user: User | null;
@@ -22,13 +34,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    localStorageClient.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
     // Listen for changes on auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = localStorageClient.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -37,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await localStorageClient.auth.signOut();
   };
 
   return (

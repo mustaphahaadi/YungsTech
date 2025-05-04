@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import UserProfile from '../components/dashboard/UserProfile';
 import ProfileSettings from '../components/profile/ProfileSettings';
 import NotificationCenter from '../components/notifications/NotificationCenter';
-import { mockUser } from '../data/mockData';
+import { mockUser } from '../lib/mockData';
 import { User } from 'lucide-react';
 
 const Profile: React.FC = () => {
