@@ -156,9 +156,4 @@ YungsTech/
 2. Deploy the contents of the `dist` directory to your hosting service
 
 ## License
-
-[Add your license information here]
-
-## Contributors
-
-[Add contributor information here]
+No lience yet
