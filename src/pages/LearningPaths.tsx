@@ -1,134 +1,87 @@
-import React, { useState } from 'react';
-import { mockLearningPaths } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
+import { api, apiRequest, LearningPath } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import LearningPathCard from '../components/learning/LearningPathCard';
-import { BookOpen, Filter, Search } from 'lucide-react';
 import PathDetails from '../components/learning/PathDetails';
-import CodeExercise from '../components/exercises/CodeExercise';
-import { mockExercises } from '../data/mockData';
 
 const LearningPaths: React.FC = () => {
-  const [selectedPathId, setSelectedPathId] = useState<string | null>(null);
-  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterLevel, setFilterLevel] = useState<'all' | 'beginner' | 'intermediate' | 'advanced'>('all');
-  
-  const selectedPath = selectedPathId 
-    ? mockLearningPaths.find(path => path.id === selectedPathId) 
-    : null;
-  
-  const handlePathClick = (pathId: string) => {
-    setSelectedPathId(pathId);
-    setSelectedLessonId(null);
-  };
-  
-  const handleStartLesson = (lessonId: string) => {
-    setSelectedLessonId(lessonId);
+  const [paths, setPaths] = useState<LearningPath[]>([]);
+  const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchPaths = async () => {
+      try {
+        const pathsData = await apiRequest(() => api.learning.getPaths());
+        setPaths(pathsData);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load learning paths');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPaths();
+  }, []);
+
+  const handleSelectPath = (path: LearningPath) => {
+    setSelectedPath(path);
   };
 
-  const handleLessonComplete = () => {
-    // In a real app, we would update user progress
-    // For demo, we'll just go back to the path details
-    setSelectedLessonId(null);
+  const handleBackToList = () => {
+    setSelectedPath(null);
   };
-  
-  const filteredPaths = mockLearningPaths.filter(path => {
-    const matchesSearch = path.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          path.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLevel = filterLevel === 'all' || path.level === filterLevel;
-    
-    return matchesSearch && matchesLevel;
-  });
 
-  // Show lesson/exercise if one is selected
-  if (selectedLessonId) {
-    // In a real app, we'd fetch the actual exercise
-    // For demo, we'll just show the first exercise
+  if (loading) {
     return (
-      <div className="mx-auto max-w-4xl">
-        <CodeExercise 
-          exercise={mockExercises[0]} 
-          onComplete={handleLessonComplete} 
-        />
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
       </div>
     );
   }
-  
-  // Show path details if a path is selected
+
+  if (error) {
+    return (
+      <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-md">
+        <p>{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="mt-2 text-sm font-medium text-rose-800 hover:text-rose-900"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
   if (selectedPath) {
-    return (
-      <PathDetails 
-        path={selectedPath}
-        onBack={() => setSelectedPathId(null)}
-        onStartLesson={handleStartLesson}
-      />
-    );
+    return <PathDetails path={selectedPath} onBack={handleBackToList} />;
   }
 
-  // Otherwise show all paths
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-          <BookOpen className="mr-2 h-6 w-6 text-indigo-500" />
-          Learning Paths
-        </h2>
+    <div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">Learning Paths</h1>
+        <p className="text-gray-600 mt-2">
+          Choose a learning path that matches your interests and skill level
+        </p>
       </div>
-      
-      {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="Search learning paths..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+
+      {paths.length === 0 ? (
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-md">
+          <p>No learning paths available yet. Check back soon!</p>
         </div>
-        
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Filter className="h-4 w-4 text-gray-400" />
-          </div>
-          <select
-            className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
-            value={filterLevel}
-            onChange={(e) => setFilterLevel(e.target.value as any)}
-          >
-            <option value="all">All Levels</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-        </div>
-      </div>
-      
-      {/* Path Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredPaths.map(path => (
-          <LearningPathCard
-            key={path.id}
-            path={path}
-            onClick={handlePathClick}
-          />
-        ))}
-      </div>
-      
-      {filteredPaths.length === 0 && (
-        <div className="text-center py-10">
-          <div className="text-gray-400 text-lg">No learning paths match your search</div>
-          <button 
-            className="mt-4 text-indigo-500 font-medium hover:underline"
-            onClick={() => {
-              setSearchTerm('');
-              setFilterLevel('all');
-            }}
-          >
-            Clear filters
-          </button>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {paths.map((path) => (
+            <LearningPathCard 
+              key={path.id} 
+              path={path} 
+              onClick={() => handleSelectPath(path)} 
+            />
+          ))}
         </div>
       )}
     </div>

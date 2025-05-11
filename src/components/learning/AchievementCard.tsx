@@ -1,48 +1,78 @@
 import React from 'react';
-import { Achievement } from '../../types';
+import { Achievement } from '../../lib/api';
+import { Award, Lock } from 'lucide-react';
 import Card from '../ui/Card';
-import { getIconComponent } from '../../data/mockData';
-import { Lock } from 'lucide-react';
 
 interface AchievementCardProps {
   achievement: Achievement;
+  unlocked: boolean;
+  unlockedAt: string | null;
 }
 
-const AchievementCard: React.FC<AchievementCardProps> = ({ achievement }) => {
-  const isUnlocked = !!achievement.unlockedAt;
-  const IconComponent = getIconComponent(achievement.icon);
-  
+const AchievementCard: React.FC<AchievementCardProps> = ({ 
+  achievement, 
+  unlocked, 
+  unlockedAt 
+}) => {
+  // Format the unlock date
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  // Map icon string to actual icon component
+  const renderIcon = () => {
+    switch (achievement.icon) {
+      case 'award':
+        return <Award className="w-6 h-6" />;
+      default:
+        return <Award className="w-6 h-6" />;
+    }
+  };
+
   return (
-    <Card className={`text-center transition-all duration-300 ${
-      isUnlocked ? 'bg-white' : 'bg-gray-50'
-    }`} hover={isUnlocked}>
-      <div className="relative mx-auto mb-4">
-        <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
-          isUnlocked 
-            ? 'bg-gradient-to-br from-indigo-400 to-purple-500 text-white' 
-            : 'bg-gray-200 text-gray-400'
+    <Card className={unlocked ? 'border-green-200' : 'opacity-75'}>
+      <div className="flex items-center mb-4">
+        <div className={`p-2 rounded-lg mr-3 ${
+          unlocked ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
         }`}>
-          <IconComponent className="h-8 w-8" />
+          {renderIcon()}
         </div>
-        
-        {!isUnlocked && (
-          <div className="absolute -right-1 -bottom-1 bg-gray-300 rounded-full p-1">
-            <Lock className="h-4 w-4 text-white" />
-          </div>
-        )}
+        <h3 className={`text-xl font-semibold ${
+          unlocked ? 'text-gray-800' : 'text-gray-500'
+        }`}>
+          {achievement.title}
+        </h3>
       </div>
       
-      <h3 className={`font-bold text-lg mb-2 ${
-        isUnlocked ? 'text-gray-800' : 'text-gray-500'
-      }`}>{achievement.title}</h3>
+      <p className={`mb-4 ${unlocked ? 'text-gray-600' : 'text-gray-500'}`}>
+        {achievement.description}
+      </p>
       
-      <p className={`text-sm ${
-        isUnlocked ? 'text-gray-600' : 'text-gray-500'
-      }`}>{achievement.description}</p>
+      <div className="flex justify-between items-center">
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          unlocked 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-gray-100 text-gray-600'
+        }`}>
+          {unlocked ? 'Unlocked' : 'Locked'}
+        </span>
+        
+        <span className="text-sm text-gray-500">
+          {unlocked 
+            ? `Unlocked on ${formatDate(unlockedAt!)}` 
+            : `+${achievement.xp_reward} XP`
+          }
+        </span>
+      </div>
       
-      {isUnlocked && (
-        <div className="mt-3 text-xs text-indigo-600 font-medium">
-          Unlocked on {achievement.unlockedAt?.toLocaleDateString()}
+      {!unlocked && (
+        <div className="absolute top-0 right-0 m-4">
+          <Lock className="w-5 h-5 text-gray-400" />
         </div>
       )}
     </Card>

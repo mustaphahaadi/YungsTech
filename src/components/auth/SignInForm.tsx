@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { localStorageClient } from '../../lib/localStorage';
+import { api } from '../../lib/api';
 import Button from '../ui/Button';
 import { LogIn } from 'lucide-react';
 
@@ -20,15 +20,8 @@ const SignInForm: React.FC<SignInFormProps> = ({ onSuccess, onSignUpClick }) => 
     setLoading(true);
 
     try {
-      const { data, error } = await localStorageClient.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-      if (data.user) {
-        onSuccess?.();
-      }
+      await api.auth.login(email, password);
+      onSuccess?.();
     } catch (err: any) {
       setError(err.message || 'Failed to sign in');
     } finally {

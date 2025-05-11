@@ -1,63 +1,85 @@
 import React from 'react';
-import { User } from '../../types';
-import Card from '../ui/Card';
-import Avatar from '../ui/Avatar';
-import ProgressBar from '../ui/ProgressBar';
+import { useAuth } from '../../contexts/AuthContext';
+import { User, Settings } from 'lucide-react';
 import Badge from '../ui/Badge';
-import { Award, BookOpen, Star } from 'lucide-react';
+import ProgressBar from '../ui/ProgressBar';
 
-interface UserProfileProps {
-  user: User;
-}
+const UserProfile: React.FC = () => {
+  const { user } = useAuth();
 
-const UserProfile: React.FC<UserProfileProps> = ({ user }) => {
-  // Calculate how many XP needed for next level (simple formula for demo)
-  const xpForNextLevel = user.level * 500;
-  
+  if (!user) {
+    return null;
+  }
+
+  // Calculate XP progress to next level
+  const xpForCurrentLevel = user.level * 100;
+  const xpForNextLevel = (user.level + 1) * 100;
+  const xpProgress = ((user.xp - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100;
+
   return (
-    <Card className="bg-gradient-to-r from-indigo-50 to-purple-50">
-      <div className="flex flex-col md:flex-row items-center gap-6">
-        <div className="flex-shrink-0">
-          <Avatar 
+    <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-gray-800">Your Profile</h2>
+        <button className="text-gray-400 hover:text-gray-600">
+          <Settings className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div className="flex items-center mb-6">
+        {user.avatar ? (
+          <img 
             src={user.avatar} 
-            alt={user.name}
-            size="xl"
+            alt={user.username} 
+            className="w-16 h-16 rounded-full object-cover border-2 border-indigo-200"
           />
-        </div>
-        
-        <div className="flex-1 text-center md:text-left">
-          <h2 className="text-2xl font-bold text-gray-800">{user.name}</h2>
-          
-          <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-2">
-            <Badge variant="primary" size="md">
-              Level {user.level}
-            </Badge>
-            
-            <div className="flex items-center gap-1">
-              <Award className="h-4 w-4 text-amber-500" />
-              <span className="text-gray-600">{user.achievements.filter(a => a.unlockedAt).length} Achievements</span>
-            </div>
-            
-            <div className="flex items-center gap-1">
-              <BookOpen className="h-4 w-4 text-emerald-500" />
-              <span className="text-gray-600">{user.completedLessons.length} Lessons completed</span>
-            </div>
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+            <User className="w-8 h-8 text-indigo-500" />
           </div>
-          
-          <div className="mt-4 w-full">
-            <ProgressBar 
-              value={user.xp} 
-              max={xpForNextLevel}
-              label="Experience"
-              showValue
-              variant="primary"
-              height="md"
-            />
-            <p className="text-sm text-gray-600 mt-1">{xpForNextLevel - user.xp} XP until Level {user.level + 1}</p>
+        )}
+        
+        <div className="ml-4">
+          <h3 className="font-bold text-gray-800">{user.username}</h3>
+          <div className="flex items-center mt-1">
+            <Badge color="indigo">Level {user.level}</Badge>
+            <span className="ml-2 text-sm text-gray-500">{user.xp} XP</span>
           </div>
         </div>
       </div>
-    </Card>
+
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-sm font-medium text-gray-700">Level Progress</span>
+          <span className="text-xs text-gray-500">
+            {user.xp - xpForCurrentLevel}/{xpForNextLevel - xpForCurrentLevel} XP
+          </span>
+        </div>
+        <ProgressBar progress={xpProgress} />
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex justify-between">
+          <span className="text-sm text-gray-600">Learning Speed</span>
+          <span className="text-sm font-medium text-gray-800">
+            {user.learning_speed.charAt(0).toUpperCase() + user.learning_speed.slice(1)}
+          </span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="text-sm text-gray-600">Learning Style</span>
+          <span className="text-sm font-medium text-gray-800">
+            {user.preferred_learning_style.charAt(0).toUpperCase() + user.preferred_learning_style.slice(1)}
+          </span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="text-sm text-gray-600">Daily Goal</span>
+          <span className="text-sm font-medium text-gray-800">
+            {user.daily_goal} minutes
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };
 

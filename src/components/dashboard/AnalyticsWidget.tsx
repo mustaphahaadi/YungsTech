@@ -1,112 +1,92 @@
-import React, { useEffect, useState } from 'react';
-import Card from '../ui/Card';
-import ProgressBar from '../ui/ProgressBar';
-import { BarChart, Clock, Zap, Target } from 'lucide-react';
-import { getPersonalizedRecommendations } from '../../lib/analytics';
+import React from 'react';
+import { Clock, Calendar, TrendingUp } from 'lucide-react';
 
-interface AnalyticsSummary {
-  learningVelocity: number;
-  topicStrengths: { [key: string]: number };
-  recommendedContent: any[];
-}
+// Mock data for analytics
+// In a real app, this would come from an API
+const analytics = {
+  weeklyProgress: {
+    timeSpent: 210, // minutes
+    lessonsCompleted: 5,
+    xpEarned: 350
+  },
+  weeklyGoal: 300, // minutes
+  weeklyCompletion: 70, // percentage
+  dailyStreak: 3
+};
 
 const AnalyticsWidget: React.FC = () => {
-  const [analytics, setAnalytics] = useState<AnalyticsSummary>({
-    learningVelocity: 0,
-    topicStrengths: {},
-    recommendedContent: []
-  });
-
-  useEffect(() => {
-    const loadAnalytics = async () => {
-      const recommendations = await getPersonalizedRecommendations();
-      setAnalytics(prev => ({
-        ...prev,
-        recommendedContent: recommendations
-      }));
-    };
-
-    loadAnalytics();
-  }, []);
+  // Format minutes as hours and minutes
+  const formatTime = (minutes: number): string => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${mins}m`;
+    }
+    return `${mins}m`;
+  };
 
   return (
-    <Card>
-      <div className="flex items-center gap-2 mb-6">
-        <BarChart className="h-5 w-5 text-indigo-500" />
-        <h2 className="text-xl font-bold text-gray-800">Learning Analytics</h2>
-      </div>
-
-      <div className="space-y-6">
-        {/* Learning Velocity */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-amber-500" />
-              <span className="font-medium text-gray-700">Learning Velocity</span>
-            </div>
-            <span className="text-sm text-gray-500">
-              {analytics.learningVelocity.toFixed(1)} lessons/day
-            </span>
+    <div className="space-y-6">
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <div className="flex items-center">
+            <Clock className="w-4 h-4 text-gray-500 mr-1" />
+            <span className="text-sm font-medium text-gray-700">Weekly Progress</span>
           </div>
-          <ProgressBar
-            value={analytics.learningVelocity * 10}
-            max={50}
-            variant="warning"
-            height="sm"
-          />
+          <span className="text-sm text-gray-500">
+            {formatTime(analytics.weeklyProgress.timeSpent)} / {formatTime(analytics.weeklyGoal)}
+          </span>
         </div>
-
-        {/* Topic Strengths */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Target className="h-4 w-4 text-emerald-500" />
-            <span className="font-medium text-gray-700">Topic Strengths</span>
-          </div>
-          <div className="space-y-2">
-            {Object.entries(analytics.topicStrengths).map(([topic, strength]) => (
-              <div key={topic}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">{topic}</span>
-                  <span className="text-gray-500">{strength}%</span>
-                </div>
-                <ProgressBar
-                  value={strength}
-                  max={100}
-                  variant="success"
-                  height="sm"
-                />
-              </div>
-            ))}
-          </div>
+        
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div 
+            className="bg-indigo-600 h-2.5 rounded-full" 
+            style={{ width: `${analytics.weeklyCompletion}%` }}
+          ></div>
         </div>
-
-        {/* Recommended Content */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Clock className="h-4 w-4 text-blue-500" />
-            <span className="font-medium text-gray-700">Recommended Next</span>
-          </div>
-          <div className="space-y-2">
-            {analytics.recommendedContent.map((content) => (
-              <div
-                key={content.id}
-                className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-medium text-gray-800">{content.title}</h4>
-                    <p className="text-sm text-gray-600">{content.reason}</p>
-                  </div>
-                  <div className="text-xs font-medium text-indigo-600">
-                    {Math.round(content.score * 100)}% match
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        
+        <div className="flex justify-between mt-2 text-xs text-gray-500">
+          <span>{analytics.weeklyCompletion}% of weekly goal</span>
+          <span>{formatTime(analytics.weeklyGoal - analytics.weeklyProgress.timeSpent)} remaining</span>
         </div>
       </div>
-    </Card>
+      
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-gray-50 rounded-lg p-3 text-center">
+          <div className="text-xl font-bold text-gray-800">
+            {analytics.weeklyProgress.lessonsCompleted}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">Lessons</div>
+        </div>
+        
+        <div className="bg-gray-50 rounded-lg p-3 text-center">
+          <div className="text-xl font-bold text-gray-800">
+            {analytics.weeklyProgress.xpEarned}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">XP Earned</div>
+        </div>
+        
+        <div className="bg-gray-50 rounded-lg p-3 text-center">
+          <div className="text-xl font-bold text-gray-800">
+            {analytics.dailyStreak}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">Day Streak</div>
+        </div>
+      </div>
+      
+      <div className="flex justify-between items-center">
+        <div className="flex items-center text-sm text-gray-600">
+          <Calendar className="w-4 h-4 mr-1" />
+          <span>This Week</span>
+        </div>
+        
+        <button className="flex items-center text-sm text-indigo-600 hover:text-indigo-800">
+          <TrendingUp className="w-4 h-4 mr-1" />
+          <span>View Details</span>
+        </button>
+      </div>
+    </div>
   );
 };
 

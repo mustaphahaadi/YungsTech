@@ -1,69 +1,41 @@
 import React from 'react';
 
 interface ProgressBarProps {
-  value: number;
-  max: number;
-  label?: string;
-  showValue?: boolean;
-  variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+  progress: number; // 0-100
+  color?: 'indigo' | 'green' | 'yellow' | 'red' | 'blue';
   height?: 'sm' | 'md' | 'lg';
-  animated?: boolean;
   className?: string;
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
-  value,
-  max,
-  label,
-  showValue = false,
-  variant = 'primary',
+  progress,
+  color = 'indigo',
   height = 'md',
-  animated = true,
-  className = ''
+  className = '',
 }) => {
-  const percentage = Math.min(Math.max(0, (value / max) * 100), 100);
+  // Ensure progress is between 0-100
+  const normalizedProgress = Math.min(Math.max(progress, 0), 100);
   
-  const baseStyle = 'w-full rounded-full overflow-hidden bg-gray-200';
-  
-  const variantStyles = {
-    primary: 'bg-indigo-500',
-    secondary: 'bg-sky-500',
-    success: 'bg-emerald-500',
-    warning: 'bg-amber-500',
-    danger: 'bg-rose-500'
+  const colorClasses = {
+    indigo: 'bg-indigo-600',
+    green: 'bg-green-600',
+    yellow: 'bg-yellow-500',
+    red: 'bg-rose-600',
+    blue: 'bg-blue-600',
   };
   
-  const heightStyles = {
-    sm: 'h-2',
-    md: 'h-4',
-    lg: 'h-6'
+  const heightClasses = {
+    sm: 'h-1.5',
+    md: 'h-2.5',
+    lg: 'h-4',
   };
-
-  const animationStyle = animated ? 'transition-all duration-500 ease-out' : '';
-  
-  const containerClasses = [baseStyle, heightStyles[height], className].join(' ');
-  const barClasses = [variantStyles[variant], heightStyles[height], animationStyle].join(' ');
 
   return (
-    <div className="w-full">
-      {label && (
-        <div className="flex justify-between mb-1">
-          <span className="text-sm font-medium text-gray-700">{label}</span>
-          {showValue && (
-            <span className="text-sm font-medium text-gray-700">{value}/{max}</span>
-          )}
-        </div>
-      )}
-      <div className={containerClasses}>
-        <div 
-          className={barClasses} 
-          style={{ width: `${percentage}%` }}
-          role="progressbar" 
-          aria-valuenow={value} 
-          aria-valuemin={0} 
-          aria-valuemax={max}
-        ></div>
-      </div>
+    <div className={`w-full bg-gray-200 rounded-full ${heightClasses[height]} ${className}`}>
+      <div 
+        className={`${colorClasses[color]} ${heightClasses[height]} rounded-full transition-all duration-300 ease-in-out`}
+        style={{ width: `${normalizedProgress}%` }}
+      ></div>
     </div>
   );
 };

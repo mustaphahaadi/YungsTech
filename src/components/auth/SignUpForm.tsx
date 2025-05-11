@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { localStorageClient } from '../../lib/localStorage';
+import { api } from '../../lib/api';
 import Button from '../ui/Button';
 import { UserPlus } from 'lucide-react';
 
@@ -12,6 +12,9 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignInClick }) => 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [learningSpeed, setLearningSpeed] = useState('medium');
+  const [learningStyle, setLearningStyle] = useState('visual');
+  const [dailyGoal, setDailyGoal] = useState(30);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -21,23 +24,18 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignInClick }) => 
     setLoading(true);
 
     try {
-      const { data, error } = await localStorageClient.auth.signUp({
+      await api.auth.register({
+        username,
         email,
         password,
-        options: {
-          data: {
-            username,
-            learning_speed: 'medium',
-            preferred_learning_style: 'visual',
-            daily_goal: 30
-          }
-        }
+        learning_speed: learningSpeed,
+        preferred_learning_style: learningStyle,
+        daily_goal: dailyGoal
       });
-
-      if (error) throw error;
-      if (data.user) {
-        onSuccess?.();
-      }
+      
+      // After registration, log the user in
+      await api.auth.login(email, password);
+      onSuccess?.();
     } catch (err: any) {
       setError(err.message || 'Failed to sign up');
     } finally {
@@ -90,6 +88,53 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignInClick }) => 
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             required
             minLength={6}
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="learningSpeed" className="block text-sm font-medium text-gray-700 mb-1">
+            Learning Speed
+          </label>
+          <select
+            id="learningSpeed"
+            value={learningSpeed}
+            onChange={(e) => setLearningSpeed(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="slow">Slow</option>
+            <option value="medium">Medium</option>
+            <option value="fast">Fast</option>
+          </select>
+        </div>
+        
+        <div>
+          <label htmlFor="learningStyle" className="block text-sm font-medium text-gray-700 mb-1">
+            Preferred Learning Style
+          </label>
+          <select
+            id="learningStyle"
+            value={learningStyle}
+            onChange={(e) => setLearningStyle(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="visual">Visual</option>
+            <option value="practical">Practical</option>
+            <option value="theoretical">Theoretical</option>
+          </select>
+        </div>
+        
+        <div>
+          <label htmlFor="dailyGoal" className="block text-sm font-medium text-gray-700 mb-1">
+            Daily Goal (minutes)
+          </label>
+          <input
+            id="dailyGoal"
+            type="number"
+            min="5"
+            max="240"
+            value={dailyGoal}
+            onChange={(e) => setDailyGoal(parseInt(e.target.value))}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
 

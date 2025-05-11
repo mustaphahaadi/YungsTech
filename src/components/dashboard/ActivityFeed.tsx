@@ -1,132 +1,101 @@
 import React from 'react';
-import Card from '../ui/Card';
-import Badge from '../ui/Badge';
-import { Award, BookOpen, Flag, Star, Trophy } from 'lucide-react';
+import { CheckCircle, Award, BookOpen, Code } from 'lucide-react';
 
-interface ActivityItem {
-  id: string;
-  date: Date;
-  type: 'lesson_completed' | 'achievement_unlocked' | 'level_up' | 'path_started';
-  title: string;
-  description: string;
-  xp?: number;
-}
-
-const mockActivities: ActivityItem[] = [
+// Mock data for activity feed
+// In a real app, this would come from an API
+const activities = [
   {
-    id: '1',
-    date: new Date('2023-10-02T15:30:00'),
+    id: 1,
     type: 'lesson_completed',
-    title: 'Completed "What is a Computer?"',
-    description: 'You finished your first lesson!',
-    xp: 10
+    title: 'Completed "Introduction to Python"',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+    xp: 50,
+    icon: <CheckCircle className="w-4 h-4" />,
+    iconBg: 'bg-green-100',
+    iconColor: 'text-green-600'
   },
   {
-    id: '2',
-    date: new Date('2023-10-02T15:45:00'),
+    id: 2,
     type: 'achievement_unlocked',
-    title: 'Achievement Unlocked: First Steps',
-    description: 'Complete your first lesson',
-    xp: 50
+    title: 'Unlocked "First Steps" achievement',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
+    xp: 100,
+    icon: <Award className="w-4 h-4" />,
+    iconBg: 'bg-yellow-100',
+    iconColor: 'text-yellow-600'
   },
   {
-    id: '3',
-    date: new Date('2023-10-03T10:15:00'),
-    type: 'lesson_completed',
-    title: 'Completed "Mouse and Keyboard Skills"',
-    description: 'You\'re getting better at using the computer!',
-    xp: 15
+    id: 3,
+    type: 'path_started',
+    title: 'Started "Web Development Basics" path',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+    xp: 10,
+    icon: <BookOpen className="w-4 h-4" />,
+    iconBg: 'bg-blue-100',
+    iconColor: 'text-blue-600'
   },
   {
-    id: '4',
-    date: new Date('2023-10-04T14:20:00'),
-    type: 'level_up',
-    title: 'Leveled Up to Level 2!',
-    description: 'Keep going to unlock more content',
-    xp: 100
+    id: 4,
+    type: 'challenge_completed',
+    title: 'Completed daily coding challenge',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
+    xp: 75,
+    icon: <Code className="w-4 h-4" />,
+    iconBg: 'bg-indigo-100',
+    iconColor: 'text-indigo-600'
   }
 ];
 
 const ActivityFeed: React.FC = () => {
+  // Format relative time
+  const formatRelativeTime = (date: Date): string => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffDays > 0) {
+      return diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
+    }
+    if (diffHours > 0) {
+      return `${diffHours}h ago`;
+    }
+    if (diffMins > 0) {
+      return `${diffMins}m ago`;
+    }
+    return 'Just now';
+  };
+
   return (
-    <Card bordered>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-lg text-gray-800">Recent Activity</h3>
-      </div>
-      
-      <div className="space-y-4">
-        {mockActivities.map(activity => (
-          <div key={activity.id} className="flex gap-4">
-            <div className={`flex-shrink-0 rounded-full p-2 ${getActivityIconBg(activity.type)}`}>
-              {getActivityIcon(activity.type)}
+    <div className="space-y-4">
+      {activities.map(activity => (
+        <div key={activity.id} className="flex items-start">
+          <div className={`p-2 rounded-full mr-3 ${activity.iconBg} ${activity.iconColor}`}>
+            {activity.icon}
+          </div>
+          
+          <div className="flex-1">
+            <div className="flex justify-between items-start">
+              <h4 className="font-medium text-gray-800">{activity.title}</h4>
+              <span className="text-xs text-gray-500">
+                {formatRelativeTime(activity.timestamp)}
+              </span>
             </div>
             
-            <div className="flex-1">
-              <div className="flex justify-between">
-                <h4 className="font-medium text-gray-800">{activity.title}</h4>
-                <span className="text-sm text-gray-500">
-                  {formatDate(activity.date)}
-                </span>
-              </div>
-              
-              <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
-              
-              {activity.xp && (
-                <div className="mt-2 flex items-center">
-                  <Star className="h-3.5 w-3.5 text-amber-500 mr-1" />
-                  <span className="text-xs font-medium text-amber-600">+{activity.xp} XP</span>
-                </div>
-              )}
+            <div className="text-xs text-gray-500 mt-1">
+              +{activity.xp} XP
             </div>
           </div>
-        ))}
-      </div>
-    </Card>
+        </div>
+      ))}
+      
+      <button className="w-full text-center text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-2">
+        View all activity
+      </button>
+    </div>
   );
-};
-
-// Helper functions
-const getActivityIcon = (type: string) => {
-  switch(type) {
-    case 'lesson_completed':
-      return <BookOpen className="h-5 w-5 text-white" />;
-    case 'achievement_unlocked':
-      return <Trophy className="h-5 w-5 text-white" />;
-    case 'level_up':
-      return <Award className="h-5 w-5 text-white" />;
-    case 'path_started':
-      return <Flag className="h-5 w-5 text-white" />;
-    default:
-      return <Star className="h-5 w-5 text-white" />;
-  }
-};
-
-const getActivityIconBg = (type: string) => {
-  switch(type) {
-    case 'lesson_completed':
-      return 'bg-emerald-500';
-    case 'achievement_unlocked':
-      return 'bg-amber-500';
-    case 'level_up':
-      return 'bg-indigo-500';
-    case 'path_started':
-      return 'bg-sky-500';
-    default:
-      return 'bg-gray-500';
-  }
-};
-
-const formatDate = (date: Date) => {
-  const now = new Date();
-  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-  
-  if (diffDays === 0) {
-    return 'Today';
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else {
-    return date.toLocaleDateString();
-  }
 };
 
 export default ActivityFeed;

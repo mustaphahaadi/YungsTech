@@ -1,25 +1,99 @@
 # YungsTech Learning Platform
 
-A modern learning platform with gamification features, built with React (TypeScript) frontend and Django REST API backend.
+A full-stack learning platform with gamification features to make learning tech skills engaging and fun.
 
-## Project Overview
+## Features
 
-YungsTech is an interactive learning platform designed to make tech education engaging through gamification. The platform combines a React frontend with a Django backend to deliver a seamless learning experience.
+- User authentication and profiles
+- Personalized learning paths
+- Interactive lessons and exercises
+- Gamification (achievements, streaks, daily challenges)
+- Progress tracking and analytics
+- Community features
 
 ## Tech Stack
 
-### Frontend
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **TailwindCSS** for styling
-- **Monaco Editor** for code editing capabilities
-- **Local Storage** for client-side data persistence
-
 ### Backend
-- **Django 5.0.2** with Django REST Framework
-- **PostgreSQL** database
-- **JWT Authentication** using Simple JWT
-- **CORS** support for cross-origin requests
+- Django
+- Django REST Framework
+- JWT Authentication
+- SQLite (development) / PostgreSQL (production)
+
+### Frontend
+- React
+- TypeScript
+- Tailwind CSS
+- Vite
+
+## Getting Started
+
+### Prerequisites
+- Python 3.8+
+- Node.js 16+
+- npm or yarn
+
+### Backend Setup
+
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
+
+2. Create a virtual environment:
+   ```
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment:
+   - Windows: `venv\Scripts\activate`
+   - macOS/Linux: `source venv/bin/activate`
+
+4. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+5. Set up environment variables:
+   Create a `.env` file in the backend directory with:
+   ```
+   DJANGO_SECRET_KEY=your_secret_key
+   DEBUG=True
+   ```
+
+6. Run migrations:
+   ```
+   python manage.py migrate
+   ```
+
+7. Create a superuser:
+   ```
+   python manage.py createsuperuser
+   ```
+
+8. Start the development server:
+   ```
+   python manage.py runserver
+   ```
+
+### Frontend Setup
+
+1. Navigate to the project root directory
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the development server:
+   ```
+   npm run dev
+   ```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+## API Documentation
+
+The API documentation is available at `/api/docs/` when the backend server is running.
 
 ## Project Structure
 
@@ -27,161 +101,24 @@ YungsTech is an interactive learning platform designed to make tech education en
 YungsTech/
 ├── backend/               # Django backend
 │   ├── core/              # Project settings
-│   ├── users/             # User management app
-│   ├── learning/          # Learning content app
-│   ├── gamification/      # Gamification features app
-│   └── manage.py          # Django management script
-│
+│   ├── users/             # User authentication and profiles
+│   ├── learning/          # Learning paths and lessons
+│   └── gamification/      # Achievements, streaks, challenges
 ├── src/                   # React frontend
 │   ├── components/        # Reusable UI components
-│   ├── contexts/          # React context providers
-│   ├── pages/             # Application pages
-│   ├── lib/               # Utility functions
+│   ├── contexts/          # React contexts
+│   ├── lib/               # Utilities and API clients
+│   ├── pages/             # Page components
 │   └── types/             # TypeScript type definitions
-│
-└── .env                   # Environment variables
+└── public/                # Static assets
 ```
-
-## Getting Started
-
-### Prerequisites
-- Node.js (v16+)
-- Python (v3.10+)
-- PostgreSQL
-
-### Backend Setup
-
-1. Create a Python virtual environment:
-   ```bash
-   cd backend
-   python -m venv venv
-   ```
-
-2. Activate the virtual environment:
-   ```bash
-   # On Windows
-   venv\Scripts\activate
-   # On macOS/Linux
-   source venv/bin/activate
-   ```
-
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Create a `.env` file in the backend directory with the following variables:
-   ```
-   DJANGO_SECRET_KEY=your_secret_key
-   DEBUG=True
-   DB_NAME=your_db_name
-   DB_USER=your_db_user
-   DB_PASSWORD=your_db_password
-   DB_HOST=localhost
-   DB_PORT=5432
-   ```
-
-5. Run migrations:
-   ```bash
-   python manage.py migrate
-   ```
-
-6. Start the development server:
-   ```bash
-   python manage.py runserver
-   ```
-
-### Frontend Setup
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-3. The application will be available at `http://localhost:5173`
-
-## Features
-
-- **User Authentication**: Secure login and registration system
-- **Learning Modules**: Structured content for effective learning
-- **Interactive Code Editor**: Built-in Monaco editor for coding exercises
-- **Gamification**: Points, badges, and achievements to motivate learners
-- **Progress Tracking**: Monitor learning progress and achievements
-
-## Development
-
-### Backend Development
-
-- Create new Django apps as needed:
-  ```bash
-  python manage.py startapp app_name
-  ```
-
-- Run tests:
-  ```bash
-  python manage.py test
-  ```
-
-### Frontend Development
-
-- Lint code:
-  ```bash
-  npm run lint
-  ```
-
-- Build for production:
-  ```bash
-  npm run build
-  ```
-
-## Client-Side Storage
-
-The application uses browser's Local Storage for client-side data persistence. This includes:
-
-- User preferences
-- Authentication tokens
-- Learning progress
-- Cached content
-
-To implement local storage in your components:
-
-```typescript
-// Save data to localStorage
-const saveData = (key: string, value: any) => {
-  localStorage.setItem(key, JSON.stringify(value));
-};
-
-// Retrieve data from localStorage
-const loadData = (key: string) => {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : null;
-};
-```
-
-## Deployment
-
-### Backend Deployment
-1. Set `DEBUG=False` in production
-2. Configure proper `ALLOWED_HOSTS` and `CORS_ALLOWED_ORIGINS`
-3. Use a production-ready server like Gunicorn
-4. Set up proper static files serving
-
-### Frontend Deployment
-1. Build the frontend:
-   ```bash
-   npm run build
-   ```
-2. Deploy the contents of the `dist` directory to your hosting service
 
 ## License
 
-This project is currently unlicensed.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Contributors
+## Acknowledgments
 
-YungsTech Team
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Lucide Icons](https://lucide.dev/)
+- [Django REST Framework](https://www.django-rest-framework.org/)
