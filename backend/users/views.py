@@ -4,6 +4,10 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
 from .serializers import UserSerializer, CustomTokenObtainPairSerializer, UserRegistrationSerializer
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -24,6 +28,29 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return UserRegistrationSerializer
         return UserSerializer
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            logger.info(f"Registration attempt with data: {request.data}")
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save()
+            
+            # Return user data and token
+            from rest_framework_simplejwt.tokens import RefreshToken
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'user': UserSerializer(user).data,
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(f"Registration error: {str(e)}")
+            return Response(
+                {'detail': str(e)}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(detail=False, methods=['get'])
     def me(self, request):

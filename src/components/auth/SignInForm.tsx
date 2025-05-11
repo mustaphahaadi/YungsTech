@@ -9,7 +9,7 @@ interface SignInFormProps {
 }
 
 const SignInForm: React.FC<SignInFormProps> = ({ onSuccess, onSignUpClick }) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,9 +20,12 @@ const SignInForm: React.FC<SignInFormProps> = ({ onSuccess, onSignUpClick }) => 
     setLoading(true);
 
     try {
-      await api.auth.login(email, password);
+      console.log('Submitting login form with username:', username);
+      await api.auth.login(username, password);
+      console.log('Login successful');
       onSuccess?.();
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.message || 'Failed to sign in');
     } finally {
       setLoading(false);
@@ -35,14 +38,14 @@ const SignInForm: React.FC<SignInFormProps> = ({ onSuccess, onSignUpClick }) => 
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+            Username
           </label>
           <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="username"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             required
           />

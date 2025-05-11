@@ -94,11 +94,23 @@ export interface DailyChallenge {
 
 // Helper function to handle API responses
 async function handleResponse<T>(response: Response): Promise<T> {
+  const contentType = response.headers.get('content-type');
+  
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `API error: ${response.status}`);
+    if (contentType && contentType.includes('application/json')) {
+      const errorData = await response.json();
+      console.error('API Error Response:', errorData);
+      throw new Error(errorData.detail || errorData.message || `API error: ${response.status}`);
+    } else {
+      throw new Error(`API error: ${response.status}`);
+    }
   }
-  return response.json() as Promise<T>;
+  
+  if (contentType && contentType.includes('application/json')) {
+    return response.json() as Promise<T>;
+  }
+  
+  return {} as T;
 }
 
 // Get the stored auth token
@@ -126,11 +138,14 @@ function createHeaders(includeAuth: boolean = true): HeadersInit {
 export const api = {
   // Auth
   auth: {
-    login: async (email: string, password: string): Promise<AuthResponse> => {
+    login: async (username: string, password: string): Promise<AuthResponse> => {
+      console.log('Attempting login with username:', username);
+      
+      // Use username field for login as expected by Django REST framework JWT
       const response = await fetch(`${API_URL}/users/token/`, {
         method: 'POST',
         headers: createHeaders(false),
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
       
       const data = await handleResponse<AuthResponse>(response);
@@ -147,13 +162,25 @@ export const api = {
       preferred_learning_style?: string;
       daily_goal?: number;
     }): Promise<User> => {
+      console.log('Attempting registration with:', { ...userData, password: '***' });
+      
       const response = await fetch(`${API_URL}/users/register/`, {
         method: 'POST',
         headers: createHeaders(false),
         body: JSON.stringify(userData),
       });
       
-      return handleResponse<User>(response);
+      const data = await handleResponse<{user: User; access: string; refresh: string}>(response);
+      
+      // Store tokens if they're returned with registration
+      if (data.access) {
+        localStorage.setItem('auth_token', data.access);
+      }
+      if (data.refresh) {
+        localStorage.setItem('refresh_token', data.refresh);
+      }
+      
+      return data.user;
     },
     
     refreshToken: async (): Promise<{ access: string }> => {

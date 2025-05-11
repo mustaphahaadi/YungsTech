@@ -24,19 +24,29 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignInClick }) => 
     setLoading(true);
 
     try {
-      await api.auth.register({
+      console.log('Submitting registration form with:', { email, username });
+      
+      const userData = {
         username,
         email,
         password,
         learning_speed: learningSpeed,
         preferred_learning_style: learningStyle,
         daily_goal: dailyGoal
-      });
+      };
       
-      // After registration, log the user in
-      await api.auth.login(email, password);
+      console.log('Registration data:', { ...userData, password: '***' });
+      
+      const user = await api.auth.register(userData);
+      console.log('Registration successful', user);
+      
+      // After registration, log the user in with username
+      await api.auth.login(username, password);
+      console.log('Auto-login after registration successful');
+      
       onSuccess?.();
     } catch (err: any) {
+      console.error('Registration error:', err);
       setError(err.message || 'Failed to sign up');
     } finally {
       setLoading(false);
