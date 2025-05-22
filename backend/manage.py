@@ -5,7 +5,6 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    # Add the current directory to the Python path
     current_path = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, current_path)
     
