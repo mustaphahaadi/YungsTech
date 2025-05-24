@@ -18,6 +18,14 @@ import Challenges from './pages/Challenges';
 import Bookmarks from './pages/Bookmarks';
 import Footer from './components/navigation/Footer';
 import Landing from './pages/Landing';
+import Tutorials from './pages/Tutorials';
+import Certifications from './pages/Certifications';
+import Forums from './pages/Forums';
+import Blog from './pages/Blog';
+import Contribute from './pages/Contribute';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import CookiePolicy from './pages/CookiePolicy';
 
 function App() {
   const [currentNav, setCurrentNav] = useState('home');
@@ -73,6 +81,18 @@ function App() {
           <Route path="/help" element={user ? <Help /> : <Navigate to="/" />} />
           <Route path="/profile" element={user ? <Profile activeTab="profile" /> : <Navigate to="/" />} />
           <Route path="/settings" element={user ? <Profile activeTab="settings" /> : <Navigate to="/" />} />
+          
+          {/* Additional routes from Footer */}
+          <Route path="/tutorials" element={user ? <Tutorials /> : <Navigate to="/" />} />
+          <Route path="/certifications" element={user ? <Certifications /> : <Navigate to="/" />} />
+          <Route path="/forums" element={user ? <Forums /> : <Navigate to="/" />} />
+          <Route path="/blog" element={user ? <Blog /> : <Navigate to="/" />} />
+          <Route path="/contribute" element={user ? <Contribute /> : <Navigate to="/" />} />
+          
+          {/* Policy pages - available to all users */}
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/cookies" element={<CookiePolicy />} />
           
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" />} />

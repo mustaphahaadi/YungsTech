@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Facebook, 
   Twitter, 
@@ -24,19 +25,19 @@ const Footer: React.FC = () => {
               Empowering the next generation of tech innovators through interactive learning and community.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-indigo-600">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-indigo-600">
                 <Facebook size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-indigo-600">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-indigo-600">
                 <Twitter size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-indigo-600">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-indigo-600">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-indigo-600">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-indigo-600">
                 <Linkedin size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-indigo-600">
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-indigo-600">
                 <Code size={20} />
               </a>
             </div>
@@ -47,19 +48,19 @@ const Footer: React.FC = () => {
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Learning</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Learning Paths</a>
+                <Link to="/paths" className="text-gray-600 hover:text-indigo-600">Learning Paths</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Tutorials</a>
+                <Link to="/tutorials" className="text-gray-600 hover:text-indigo-600">Tutorials</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Code Playground</a>
+                <Link to="/playground" className="text-gray-600 hover:text-indigo-600">Code Playground</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Challenges</a>
+                <Link to="/challenges" className="text-gray-600 hover:text-indigo-600">Challenges</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Certifications</a>
+                <Link to="/certifications" className="text-gray-600 hover:text-indigo-600">Certifications</Link>
               </li>
             </ul>
           </div>
@@ -69,19 +70,19 @@ const Footer: React.FC = () => {
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Community</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Forums</a>
+                <Link to="/forums" className="text-gray-600 hover:text-indigo-600">Forums</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Study Groups</a>
+                <Link to="/groups" className="text-gray-600 hover:text-indigo-600">Study Groups</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Events</a>
+                <Link to="/events" className="text-gray-600 hover:text-indigo-600">Events</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Blog</a>
+                <Link to="/blog" className="text-gray-600 hover:text-indigo-600">Blog</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600">Contribute</a>
+                <Link to="/contribute" className="text-gray-600 hover:text-indigo-600">Contribute</Link>
               </li>
             </ul>
           </div>
@@ -112,9 +113,9 @@ const Footer: React.FC = () => {
               &copy; {currentYear} YungsTech. All rights reserved.
             </p>
             <div className="mt-4 md:mt-0 flex space-x-6">
-              <a href="#" className="text-sm text-gray-500 hover:text-indigo-600">Privacy Policy</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-indigo-600">Terms of Service</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-indigo-600">Cookie Policy</a>
+              <Link to="/privacy" className="text-sm text-gray-500 hover:text-indigo-600">Privacy Policy</Link>
+              <Link to="/terms" className="text-sm text-gray-500 hover:text-indigo-600">Terms of Service</Link>
+              <Link to="/cookies" className="text-sm text-gray-500 hover:text-indigo-600">Cookie Policy</Link>
             </div>
           </div>
         </div>
