@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Navbar from './components/navigation/Navbar';
 import Home from './pages/Home';
@@ -16,6 +17,7 @@ import Events from './pages/Events';
 import Challenges from './pages/Challenges';
 import Bookmarks from './pages/Bookmarks';
 import Footer from './components/navigation/Footer';
+import Landing from './pages/Landing';
 
 function App() {
   const [currentNav, setCurrentNav] = useState('home');
@@ -24,11 +26,9 @@ function App() {
   const [pageLoaded, setPageLoaded] = useState(false);
 
   useEffect(() => {
-    // Simulate page loading
     const timer = setTimeout(() => {
       setPageLoaded(true);
     }, 1000);
-    
     return () => clearTimeout(timer);
   }, []);
 
@@ -49,50 +49,34 @@ function App() {
     );
   }
 
-  if (!user) {
-    return <Auth />;
-  }
-
-  const renderContent = () => {
-    switch (currentNav) {
-      case 'home':
-        return <Home onNavigateToPath={handleNavigateToPath} />;
-      case 'paths':
-        return <LearningPaths selectedPathId={selectedPathId} />;
-      case 'achievements':
-        return <Achievements />;
-      case 'challenges':
-        return <Challenges />;
-      case 'progress':
-        return <Progress />;
-      case 'leaderboard':
-        return <Leaderboard />;
-      case 'community':
-      case 'forum':
-        return <Community activeTab={currentNav === 'forum' ? 'forum' : 'community'} />;
-      case 'playground':
-        return <Playground />;
-      case 'groups':
-        return <StudyGroups />;
-      case 'events':
-        return <Events />;
-      case 'bookmarks':
-        return <Bookmarks />;
-      case 'help':
-        return <Help />;
-      case 'profile':
-      case 'settings':
-        return <Profile activeTab={currentNav === 'settings' ? 'settings' : 'profile'} />;
-      default:
-        return <Home onNavigateToPath={handleNavigateToPath} />;
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50">
-      <Navbar onNavChange={setCurrentNav} currentNav={currentNav} />
-      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-10">
-        {renderContent()}
+      {user && <Navbar onNavChange={setCurrentNav} currentNav={currentNav} />}
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={!user ? <Landing /> : <Navigate to="/home" />} />
+          <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/home" />} />
+          
+          {/* Protected Routes - require authentication */}
+          <Route path="/home" element={user ? <Home onNavigateToPath={handleNavigateToPath} /> : <Navigate to="/" />} />
+          <Route path="/paths" element={user ? <LearningPaths selectedPathId={selectedPathId} /> : <Navigate to="/" />} />
+          <Route path="/achievements" element={user ? <Achievements /> : <Navigate to="/" />} />
+          <Route path="/challenges" element={user ? <Challenges /> : <Navigate to="/" />} />
+          <Route path="/progress" element={user ? <Progress /> : <Navigate to="/" />} />
+          <Route path="/leaderboard" element={user ? <Leaderboard /> : <Navigate to="/" />} />
+          <Route path="/community" element={user ? <Community /> : <Navigate to="/" />} />
+          <Route path="/forum" element={user ? <Community /> : <Navigate to="/" />} />
+          <Route path="/playground" element={user ? <Playground /> : <Navigate to="/" />} />
+          <Route path="/groups" element={user ? <StudyGroups /> : <Navigate to="/" />} />
+          <Route path="/events" element={user ? <Events /> : <Navigate to="/" />} />
+          <Route path="/bookmarks" element={user ? <Bookmarks /> : <Navigate to="/" />} />
+          <Route path="/help" element={user ? <Help /> : <Navigate to="/" />} />
+          <Route path="/profile" element={user ? <Profile activeTab="profile" /> : <Navigate to="/" />} />
+          <Route path="/settings" element={user ? <Profile activeTab="settings" /> : <Navigate to="/" />} />
+          
+          {/* Fallback route */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
       </main>
       <Footer />
     </div>
